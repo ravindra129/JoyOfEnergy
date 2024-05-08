@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,6 +16,7 @@ import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
 import uk.tw.energy.generator.ElectricityReadingsGenerator;
 
+/** Main class for the Energy application. */
 @Configuration
 public class SeedingApplicationDataConfiguration {
 
@@ -24,6 +24,19 @@ public class SeedingApplicationDataConfiguration {
   private static final String RENEWABLES_PRICE_PLAN_ID = "price-plan-1";
   private static final String STANDARD_PRICE_PLAN_ID = "price-plan-2";
 
+  /**
+   * The constructor for the {@link SeedingApplicationDataConfiguration}.
+   *
+   * <p>It does nothing, but it's constructor makes it a candidate for dependency injection by the
+   * Spring framework.
+   */
+  public SeedingApplicationDataConfiguration() {}
+
+  /**
+   * Creates and returns a list of PricePlan objects.
+   *
+   * @return a list of PricePlan objects
+   */
   @Bean
   public List<PricePlan> pricePlans() {
     final List<PricePlan> pricePlans = new ArrayList<>();
@@ -38,9 +51,16 @@ public class SeedingApplicationDataConfiguration {
     return pricePlans;
   }
 
+  /**
+   * Creates and returns a ConcurrentHashMap that maps smart meter IDs to their corresponding
+   * electricity readings.
+   *
+   * @return a ConcurrentHashMap containing the mappings between smart meter IDs and electricity
+   *     readings.
+   */
   @Bean
-  public Map<String, List<ElectricityReading>> perMeterElectricityReadings() {
-    final Map<String, List<ElectricityReading>> readings = new HashMap<>();
+  public ConcurrentHashMap<String, List<ElectricityReading>> perMeterElectricityReadings() {
+    final ConcurrentHashMap<String, List<ElectricityReading>> readings = new ConcurrentHashMap<>();
     final ElectricityReadingsGenerator electricityReadingsGenerator =
         new ElectricityReadingsGenerator();
     smartMeterToPricePlanAccounts()
@@ -50,9 +70,16 @@ public class SeedingApplicationDataConfiguration {
     return readings;
   }
 
+  /**
+   * Creates and returns a ConcurrentHashMap that maps smart meter IDs to their corresponding price
+   * plan IDs.
+   *
+   * @return a ConcurrentHashMap containing the mappings between smart meter IDs and price plan IDs.
+   */
   @Bean
-  public Map<String, String> smartMeterToPricePlanAccounts() {
-    final Map<String, String> smartMeterToPricePlanAccounts = new HashMap<>();
+  public ConcurrentHashMap<String, String> smartMeterToPricePlanAccounts() {
+    final ConcurrentHashMap<String, String> smartMeterToPricePlanAccounts =
+        new ConcurrentHashMap<>();
     smartMeterToPricePlanAccounts.put("smart-meter-0", MOST_EVIL_PRICE_PLAN_ID);
     smartMeterToPricePlanAccounts.put("smart-meter-1", RENEWABLES_PRICE_PLAN_ID);
     smartMeterToPricePlanAccounts.put("smart-meter-2", MOST_EVIL_PRICE_PLAN_ID);
@@ -61,6 +88,12 @@ public class SeedingApplicationDataConfiguration {
     return smartMeterToPricePlanAccounts;
   }
 
+  /**
+   * A description of the entire Java function.
+   *
+   * @param builder description of parameter
+   * @return description of return value
+   */
   @Bean
   @Primary
   public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
